@@ -70,6 +70,7 @@ func main() {
 				c.String(http.StatusInternalServerError, "Failed to create request")
 				return
 			}
+			logger.Info("Setting Host header", zap.String("host", host))
 			req.Header.Set("Host", host)
 			headResp, err := http.DefaultClient.Do(req)
 			if err != nil {
@@ -136,6 +137,7 @@ func main() {
 			return
 		}
 		req.Header.Set("Host", host)
+		logger.Info("Setting Host header", zap.String("host", host))
 		resp, err := http.DefaultClient.Do(req)
 		if err != nil {
 			c.String(http.StatusInternalServerError, "Failed to fetch the resource")
