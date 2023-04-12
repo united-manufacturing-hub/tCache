@@ -22,8 +22,9 @@ type MetaData struct {
 }
 
 var (
-	cacheMutex  sync.RWMutex
-	metaDataMap = make(map[string]MetaData)
+	cacheMutex         sync.RWMutex
+	metaDataMap        = make(map[string]MetaData)
+	downloadWaitGroups sync.Map
 )
 
 func getCachePath(url *url.URL) string {
@@ -173,6 +174,11 @@ func main() {
 		cacheMutex.Unlock()
 
 		logger.Info("Fetched and cached resource", zap.String("path", cachePath))
+
+		// Release the wait group for this cachePath
+		if wg, ok := downloadWaitGroups.Load(cachePath); ok {
+			wg.(*sync.WaitGroup).Done()
+		}
 
 	})
 
